@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "type": "short",
+    "category": "kinetic_sand",
+    "filename": "sand_01.mp4",
+    "status": "pending"
+  },
+  {
+    "id": 2,
+    "type": "loop",
+    "category": "foam_slime",
+    "filename": "slime_loop_01.mp4",
+    "status": "pending"
+  }
+]
