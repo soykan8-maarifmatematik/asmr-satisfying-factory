@@ -2,10 +2,51 @@
   {
     "id": 1,
     "type": "short",
+    "loop_style": "none",
     "category": "kinetic_sand",
     "filename": "sand_01.mp4",
     "title": "Satisfying Kinetic Sand Cutting ASMR #Shorts",
     "description": "Relax and enjoy the satisfying sounds of kinetic sand. #asmr #satisfying",
+    "status": "pending"
+  },
+  {
+    "id": 2,
+    "type": "loop",
+    "loop_style": "boomerang",
+    "category": "foam_slime",
+    "filename": "slime_01.mp4",
+    "title": "Deeply Satisfying Foam Slime ASMR Loop",
+    "description": "Lose yourself in the calming textures of slime. Perfect for relaxation. #asmr #slime #loop",
+    "status": "pending"
+  },
+  {
+    "id": 3,
+    "type": "short",
+    "loop_style": "none",
+    "category": "soap_carving",
+    "filename": "soap_01.mp4",
+    "title": "Sharp Soap Carving ASMR #Shorts",
+    "description": "The crisp sounds of soap carving for ultimate satisfaction. #asmr #soapcutting",
+    "status": "pending"
+  },
+  {
+    "id": 4,
+    "type": "loop",
+    "loop_style": "boomerang",
+    "category": "paper_origami",
+    "filename": "origami_01.mp4",
+    "title": "Relaxing Paper Folding ASMR Loop",
+    "description": "Soft paper crinkling and folding sounds to help you focus. #asmr #origami",
+    "status": "pending"
+  },
+  {
+    "id": 5,
+    "type": "loop",
+    "loop_style": "boomerang",
+    "category": "wax_crushing",
+    "filename": "wax_01.mp4",
+    "title": "Satisfying Wax Crushing ASMR Loop",
+    "description": "Experience the crunch of wax crushing. Perfect for deep relaxation. #asmr #waxcrushing #loop",
     "status": "pending"
   }
 ]
