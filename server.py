@@ -8,19 +8,19 @@ def process_videos():
 
     for item in queue:
         if item['status'] == 'pending':
-            # Dosya yollarını belirle
             input_file = f"content/{item['category']}/{item['filename']}"
             output_file = f"processed/{item['filename']}"
             
-            # Boomerang mantığı: Videoyu kopyala, tersini ekle ve birleştir
+            # Eğer loop ise 1 saatlik (3600s) döngü ve bumerang uygula
             if item['loop_style'] == 'boomerang':
+                # Önce bumerang yap, sonra döngüye al
                 cmd = [
                     'ffmpeg', '-i', input_file,
-                    '-vf', 'split[v1][v2];[v2]reverse[v2r];[v1][v2r]concat=n=2:v=1:a=0',
-                    '-y', output_file
+                    '-vf', 'split[v1][v2];[v2]reverse[v2r];[v1][v2r]concat=n=2:v=1:a=0,loop=loop=-1:size=2,trim=duration=3600',
+                    '-c:v', 'libx264', '-t', '3600', '-y', output_file
                 ]
             else:
-                # Shorts ise sadece optimize et (veya olduğu gibi bırak)
+                # Shorts ise sadece kopyala
                 cmd = ['ffmpeg', '-i', input_file, '-c', 'copy', '-y', output_file]
             
             subprocess.run(cmd)
