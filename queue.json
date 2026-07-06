@@ -1,1 +1,24 @@
-{"id":1,"post":null,"type":"short","title":"Satisfying Kinetic Sand Cutting ASMR #Shorts","Answer":null,"script":null,"status":"completed","Question":null,"category":"kinetic_sand","filename":"sand_01.mp4","fun_fact":null,"metadata":{"title":null},"option_a":null,"option_b":null,"hex_color":null,"mediaUrls":[],"platforms":[],"timestamp":null,"loop_style":"none","description":"Relax and enjoy the satisfying sounds of kinetic sand. #asmr #satisfying","python_code":null,"youtube_tags":null,"youtube_title":null,"youtube_description":null,"pexels_search_keyword":null}
+[
+  {
+    "id": 1,
+    "type": "short",
+    "loop_style": "none",
+    "category": "kinetic_sand",
+    "filename": "sand_01.mp4",
+    "title": "Satisfying Kinetic Sand Cutting ASMR #Shorts",
+    "description": "Relax and enjoy the satisfying sounds of kinetic sand. #asmr #satisfying",
+    "status": "pending",
+    "day_of_week": "pazartesi"
+  },
+  {
+    "id": 2,
+    "type": "loop",
+    "loop_style": "boomerang",
+    "category": "foam_slime",
+    "filename": "slime_01.mp4",
+    "title": "Deeply Satisfying Foam Slime ASMR Loop",
+    "description": "Lose yourself in the calming textures of slime. Perfect for relaxation. #asmr #slime #loop",
+    "status": "pending",
+    "day_of_week": "sali"
+  }
+]
