@@ -15,7 +15,7 @@ def process_videos():
             # İşlem klasörünün varlığından emin ol
             os.makedirs('processed', exist_ok=True)
             
-            # Loop (Ambiyans) videoları için
+            # Loop (Ambiyans) videoları için (Eski ayarlar korundu)
             if item['type'] == 'loop':
                 cmd = [
                     'ffmpeg', '-i', input_file,
@@ -23,11 +23,12 @@ def process_videos():
                     '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-t', '3600', '-y', output_file
                 ]
             else:
-                # Shorts için: 'transpose' kaldırıldı. 
-                # Video 1080x1920 içine sığdırılır, boş kalan yerler siyahla doldurulur.
+                # Shorts için DİKEY ZORLAMA: 'crop' yöntemi
+                # Videoyu önce dikey orana göre büyütür, sonra tam 1080x1920 olarak kırpar.
+                # Siyah bant bırakmaz, ekranı tamamen dikey doldurur.
                 cmd = [
                     'ffmpeg', '-i', input_file,
-                    '-vf', 'scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2',
+                    '-vf', 'scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920',
                     '-c:v', 'libx264', '-crf', '18', '-pix_fmt', 'yuv420p', '-y', output_file
                 ]
             
