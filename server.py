@@ -3,7 +3,6 @@ import os
 import subprocess
 
 def process_videos():
-    # queue.json dosyasını oku
     with open('queue.json', 'r') as f:
         queue = json.load(f)
 
@@ -12,10 +11,8 @@ def process_videos():
             input_file = f"content/{item['category']}/{item['filename']}"
             output_file = f"processed/{item['filename']}"
             
-            # İşlem klasörünün varlığından emin ol
             os.makedirs('processed', exist_ok=True)
             
-            # Loop (Ambiyans) videoları için (Eski ayarlar korundu)
             if item['type'] == 'loop':
                 cmd = [
                     'ffmpeg', '-i', input_file,
@@ -23,12 +20,13 @@ def process_videos():
                     '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-t', '3600', '-y', output_file
                 ]
             else:
-                # Shorts için DİKEY ZORLAMA: 'crop' yöntemi
-                # Videoyu önce dikey orana göre büyütür, sonra tam 1080x1920 olarak kırpar.
-                # Siyah bant bırakmaz, ekranı tamamen dikey doldurur.
+                # Shorts için Metadata Zorlamalı Yöntem:
+                # 1. scale ve crop ile dikey yap
+                # 2. metadata ile rotasyonu sıfırla ve dik olduğunu bildir
                 cmd = [
                     'ffmpeg', '-i', input_file,
                     '-vf', 'scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920',
+                    '-metadata:s:v:0', 'rotate=0',
                     '-c:v', 'libx264', '-crf', '18', '-pix_fmt', 'yuv420p', '-y', output_file
                 ]
             
@@ -39,7 +37,6 @@ def process_videos():
                 print(f"Hata oluştu: {e}")
                 item['status'] = 'failed'
 
-    # Güncellenmiş durumu kaydet
     with open('queue.json', 'w') as f:
         json.dump(queue, f, indent=2)
 
