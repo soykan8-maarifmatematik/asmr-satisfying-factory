@@ -3,6 +3,7 @@ import os
 import subprocess
 
 def process_videos():
+    # queue.json dosyasını oku
     with open('queue.json', 'r') as f:
         queue = json.load(f)
 
@@ -11,8 +12,10 @@ def process_videos():
             input_file = f"content/{item['category']}/{item['filename']}"
             output_file = f"processed/{item['filename']}"
             
+            # İşlem klasörünün varlığından emin ol
             os.makedirs('processed', exist_ok=True)
             
+            # Loop (Ambiyans) videoları için
             if item['type'] == 'loop':
                 cmd = [
                     'ffmpeg', '-i', input_file,
@@ -20,14 +23,14 @@ def process_videos():
                     '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-t', '3600', '-y', output_file
                 ]
             else:
-                # DÜZELTME: 'transpose' ekleyerek oryantasyonu sıfırlıyoruz ve dikey zorluyoruz
+                # Shorts için: 'transpose' kaldırıldı. 
+                # Video 1080x1920 içine sığdırılır, boş kalan yerler siyahla doldurulur.
                 cmd = [
                     'ffmpeg', '-i', input_file,
-                    '-vf', 'transpose=1,scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2',
+                    '-vf', 'scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2',
                     '-c:v', 'libx264', '-crf', '18', '-pix_fmt', 'yuv420p', '-y', output_file
                 ]
             
-            # Hata takibi için 'check=True' ekledik
             try:
                 subprocess.run(cmd, check=True)
                 item['status'] = 'completed'
@@ -35,6 +38,7 @@ def process_videos():
                 print(f"Hata oluştu: {e}")
                 item['status'] = 'failed'
 
+    # Güncellenmiş durumu kaydet
     with open('queue.json', 'w') as f:
         json.dump(queue, f, indent=2)
 
