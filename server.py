@@ -20,12 +20,14 @@ def process_videos():
                     '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-t', '3600', '-y', output_file
                 ]
             else:
-                # Shorts için Metadata Zorlamalı Yöntem:
-                # 1. scale ve crop ile dikey yap
-                # 2. metadata ile rotasyonu sıfırla ve dik olduğunu bildir
+                # Shorts için kesin çözüm:
+                # -force_original_aspect_ratio increase + crop: Ekranı tamamen doldurur.
+                # -aspect 9:16: Videonun dikey olduğunu metadata'ya zorla yazar.
+                # -metadata:s:v:0 rotate=0: Rotasyon sorunlarını sıfırlar.
                 cmd = [
                     'ffmpeg', '-i', input_file,
                     '-vf', 'scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920',
+                    '-aspect', '9:16',
                     '-metadata:s:v:0', 'rotate=0',
                     '-c:v', 'libx264', '-crf', '18', '-pix_fmt', 'yuv420p', '-y', output_file
                 ]
