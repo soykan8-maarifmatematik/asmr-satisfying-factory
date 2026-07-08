@@ -1,7 +1,7 @@
 [
   { "id": 1, "type": "short", "category": "kinetic_sand", "filename": "sand_01.mp4", "day_of_week": "pazartesi" },
   { "id": 2, "type": "short", "category": "soap_carving", "filename": "soap_01.mp4", "day_of_week": "sali" },
-  { "id": 3, "type": "loop", "category": "foam_slime", "filename": "slime_01.mp4", "day_of_week": "çarşamba" },
+  { "id": 3, "type": "loop", "category": "foam_slime", "filename": "slime_01.mp4", "day_of_week": "carsamba" },
   { "id": 4, "type": "short", "category": "paper_origami", "filename": "origami_01.mp4", "day_of_week": "persembe" },
   { "id": 5, "type": "short", "category": "wax_crushing", "filename": "wax_01.mp4", "day_of_week": "cuma" },
   { "id": 6, "type": "short", "category": "kinetic_sand", "filename": "sand_02.mp4", "day_of_week": "cumartesi" },
