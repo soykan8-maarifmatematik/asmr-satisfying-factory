@@ -1,21 +1,37 @@
 name: Video Processor
+
 on:
   push:
     paths:
       - 'queue.json'
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
+          
+      - name: Install dependencies
+        run: pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib
+      
       - name: Install FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      
       - name: Run Processor
-        run: python server.py
+        env:
+          # Secret'ları buraya ekliyoruz ki scriptler okuyabilsin
+          CLIENT_SECRETS_JSON: ${{ secrets.CLIENT_SECRETS_JSON }}
+          TOKEN_PICKLE_BASE64: ${{ secrets.TOKEN_PICKLE_BASE64 }}
+        run: |
+          # queue.json'dan hangi klasörün işleneceğini okuyup server.py'ye gönderiyoruz
+          FOLDER=$(python -c "import json; print(json.load(open('queue.json'))['folder'])")
+          python server.py "$FOLDER"
+      
       - name: Commit and Push
         run: |
           git config --global user.name 'github-actions'
