@@ -1,9 +1,12 @@
 name: Video Processor
 
 on:
-  push:
-    paths:
-      - 'queue.json'
+  workflow_dispatch:
+    inputs:
+      folder_path:
+        description: 'İşlenecek klasör yolu'
+        required: true
+        default: 'content/shorts/foam_slime'
 
 jobs:
   build:
@@ -24,18 +27,14 @@ jobs:
       
       - name: Run Processor
         env:
-          # Secret'ları buraya ekliyoruz ki scriptler okuyabilsin
           CLIENT_SECRETS_JSON: ${{ secrets.CLIENT_SECRETS_JSON }}
           TOKEN_PICKLE_BASE64: ${{ secrets.TOKEN_PICKLE_BASE64 }}
-        run: |
-          # queue.json'dan hangi klasörün işleneceğini okuyup server.py'ye gönderiyoruz
-          FOLDER=$(python -c "import json; print(json.load(open('queue.json'))['folder'])")
-          python server.py "$FOLDER"
+        run: python server.py "${{ github.event.inputs.folder_path }}"
       
       - name: Commit and Push
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
           git add .
-          git commit -m "Processed video and updated status"
+          git commit -m "Processed video: ${{ github.event.inputs.folder_path }}"
           git push
