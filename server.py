@@ -38,8 +38,19 @@ else:
     print(f"Bilinmeyen tip: {v_type}. Varsayılan işlem uygulanıyor.")
     os.system(f"cp {path}current_video.mp4 {path}final_video.mp4")
 
-# Metadata yazma kısmı (Ekstra garanti olsun diye)
+# Metadata yazma kısmı
 with open(f"{path}title.txt", "w") as f: f.write(str(title))
+
+# Yükleme işlemini tetikle
+print("YouTube yükleme scripti tetikleniyor...")
+# upload_to_youtube.py dosyanıza dosya yolunu parametre olarak gönderiyoruz
+upload_status = os.system(f"python upload_to_youtube.py --file {path}final_video.mp4")
+
+if upload_status == 0:
+    print("Yükleme işlemi başarıyla başlatıldı.")
+else:
+    print("HATA: Yükleme scripti çalıştırılamadı!")
+    sys.exit(1)
 
 print("İşlem başarıyla tamamlandı.")
 print(f"--- BİTİŞ ---")
