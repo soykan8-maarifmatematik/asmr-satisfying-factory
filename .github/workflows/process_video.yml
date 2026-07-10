@@ -17,4 +17,5 @@ jobs:
           PAYLOAD_DESC: ${{ github.event.client_payload.VIDEO_DESC }}
           PAYLOAD_TAGS: ${{ github.event.client_payload.VIDEO_TAGS }}
           PAYLOAD_CAT: ${{ github.event.client_payload.category }}
+          PAYLOAD_TYPE: ${{ github.event.client_payload.PAYLOAD_TYPE }}
         run: python server.py
