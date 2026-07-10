@@ -10,5 +10,11 @@ args = parser.parse_args()
 file_path = args.file
 video_title = args.title
 
-print(f"Dosya: {file_path}, Başlık: {video_title}")
-# ... BURAYA YouTube API yükleme kodlarınızı koyun ...
+print(f"--- Yükleme Başladı ---")
+print(f"Dosya Yolu: {file_path}")
+print(f"Video Başlığı: {video_title}")
+
+# YouTube API Yükleme Kodlarınızı Buraya Ekleyin
+# Örnek: upload_service.upload(file=file_path, title=video_title)
+
+print("Yükleme başarıyla tamamlandı.")
