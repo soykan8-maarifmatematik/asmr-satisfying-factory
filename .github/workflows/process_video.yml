@@ -1,40 +1,20 @@
-name: Video Processor
-
+name: Process and Publish Video
 on:
-  workflow_dispatch:
-    inputs:
-      folder_path:
-        description: 'İşlenecek klasör yolu'
-        required: true
-        default: 'content/shorts/foam_slime'
-
+  repository_dispatch:
+    types: [video_uret]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-          
-      - name: Install dependencies
-        run: pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib
-      
-      - name: Install FFmpeg
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
-      
-      - name: Run Processor
+      - name: Run Processing
         env:
-          CLIENT_SECRETS_JSON: ${{ secrets.CLIENT_SECRETS_JSON }}
-          TOKEN_PICKLE_BASE64: ${{ secrets.TOKEN_PICKLE_BASE64 }}
-        run: python server.py "${{ github.event.inputs.folder_path }}"
-      
-      - name: Commit and Push
-        run: |
-          git config --global user.name 'github-actions'
-          git config --global user.email 'github-actions@github.com'
-          git add .
-          git commit -m "Processed video: ${{ github.event.inputs.folder_path }}"
-          git push
+          PAYLOAD_TITLE: ${{ github.event.client_payload.VIDEO_TITLE }}
+          PAYLOAD_DESC: ${{ github.event.client_payload.VIDEO_DESC }}
+          PAYLOAD_TAGS: ${{ github.event.client_payload.VIDEO_TAGS }}
+          PAYLOAD_CAT: ${{ github.event.client_payload.category }}
+        run: python server.py
