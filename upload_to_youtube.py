@@ -1,21 +1,14 @@
-import os
-import base64
-import json
-import pickle
-from google.oauth2.credentials import Credentials
-from googleapiclient.discovery import build
-from googleapiclient.http import MediaFileUpload
+import argparse
+import sys
 
-# GitHub Secret'lardan bilgileri çek
-client_secrets_data = os.environ.get("CLIENT_SECRETS_JSON")
-token_b64 = os.environ.get("TOKEN_PICKLE_BASE64")
+# Argümanları al
+parser = argparse.ArgumentParser()
+parser.add_argument("--file")
+parser.add_argument("--title")
+args = parser.parse_args()
 
-# Dosyaları geçici olarak oluştur
-with open("client_secrets.json", "w") as f:
-    f.write(client_secrets_data)
+file_path = args.file
+video_title = args.title
 
-with open("token.pickle", "wb") as f:
-    f.write(base64.b64decode(token_b64))
-
-# YouTube servisini başlat
-# (Daha önce konuştuğumuz yükleme fonksiyonunu buraya entegre edeceğiz)
+print(f"Dosya: {file_path}, Başlık: {video_title}")
+# ... BURAYA YouTube API yükleme kodlarınızı koyun ...
