@@ -1,0 +1,16 @@
+name: Upload File
+on:
+  repository_dispatch:
+    types: [upload_file]
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+          echo "${{ github.event.client_payload.content }}" > ${{ github.event.client_payload.path }}
+          git config user.name "Bot"
+          git config user.email "bot@bot.com"
+          git add .
+          git commit -m "Auto upload"
+          git push
