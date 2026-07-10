@@ -1,7 +1,6 @@
 import os
 import sys
 
-# GitHub Actions üzerinden gelen ortam değişkenlerini al
 title = os.environ.get("PAYLOAD_TITLE")
 category = os.environ.get("PAYLOAD_CAT")
 v_type = os.environ.get("PAYLOAD_TYPE")
@@ -29,5 +28,4 @@ upload_status = os.system(f"python upload_to_youtube.py --file {path}final_video
 if upload_status == 0:
     print("Sistem başarıyla tamamlandı.")
 else:
-    print("HATA: Yükleme başarısız.")
     sys.exit(1)
