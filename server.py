@@ -18,14 +18,14 @@ if v_type == "loop":
 else:
     os.system(f"cp {path}current_video.mp4 {path}final_video.mp4")
 
-# 2. Metadata
-with open(f"{path}title.txt", "w") as f: f.write(str(title))
-
-# 3. Yükleme Tetikleyici
+# 2. Yükleme Tetikleyici
 print(f"Yükleme başlatılıyor: {path}final_video.mp4")
-upload_status = os.system(f"python upload_to_youtube.py --file {path}final_video.mp4 --title '{title}'")
+# Dosya yolunu ve başlığı tırnak içine alarak gönderiyoruz
+cmd = f'python upload_to_youtube.py --file "{path}final_video.mp4" --title "{title}"'
+upload_status = os.system(cmd)
 
 if upload_status == 0:
     print("Sistem başarıyla tamamlandı.")
 else:
+    print("Yükleme başarısız oldu.")
     sys.exit(1)
