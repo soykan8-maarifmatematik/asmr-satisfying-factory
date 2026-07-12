@@ -15,14 +15,12 @@ jobs:
           python-version: '3.9'
 
       - name: Install Dependencies
-        run: |
-          pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib
+        run: pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib
 
       - name: Create Secrets
         run: |
-          # Secret'taki veriyi al ve dosyalara geri dönüştür
-          # JSON tırnak sorununu engellemek için doğrudan yazdırıyoruz
-          printf '%s' '${{ secrets.CLIENT_SECRETS_JSON }}' > client_secrets.json
+          # Secrets'ı Base64 ile dosyalara yaz (Tırnak çakışmasını önler)
+          echo '${{ secrets.CLIENT_SECRETS_BASE64 }}' | base64 -d > client_secrets.json
           echo '${{ secrets.TOKEN_PICKLE_BASE64 }}' | base64 -d > token.pickle
 
       - name: Run Processing
@@ -30,5 +28,4 @@ jobs:
           PAYLOAD_TITLE: ${{ github.event.client_payload.VIDEO_TITLE }}
           PAYLOAD_CAT: ${{ github.event.client_payload.category }}
           PAYLOAD_TYPE: ${{ github.event.client_payload.PAYLOAD_TYPE }}
-        run: |
-          python server.py
+        run: python server.py
