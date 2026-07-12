@@ -20,8 +20,9 @@ jobs:
 
       - name: Create Secrets
         run: |
-          # Base64 ile kodlanmış secret'ları dosyalara güvenli şekilde geri dönüştür
-          echo '${{ secrets.CLIENT_SECRETS_BASE64 }}' | base64 -d > client_secrets.json
+          # Secret'taki veriyi al ve dosyalara geri dönüştür
+          # JSON tırnak sorununu engellemek için doğrudan yazdırıyoruz
+          printf '%s' '${{ secrets.CLIENT_SECRETS_JSON }}' > client_secrets.json
           echo '${{ secrets.TOKEN_PICKLE_BASE64 }}' | base64 -d > token.pickle
 
       - name: Run Processing
