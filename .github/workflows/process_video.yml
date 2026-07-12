@@ -19,22 +19,15 @@ jobs:
 
       - name: Create Secrets
         run: |
-          # Secret değerlerini kontrol et, eğer boşsa hata ver
-          if [ -z "${{ secrets.CLIENT_SECRETS_BASE64 }}" ]; then echo "HATA: CLIENT_SECRETS_BASE64 bulunamadı!"; exit 1; fi
-          if [ -z "${{ secrets.TOKEN_PICKLE_BASE64 }}" ]; then echo "HATA: TOKEN_PICKLE_BASE64 bulunamadı!"; exit 1; fi
+          # 1. Secret boş mu kontrol et (Boşsa işlemi durdur)
+          if [ -z "${{ secrets.CLIENT_SECRETS_BASE64 }}" ]; then echo "HATA: CLIENT_SECRETS_BASE64 tanımlı değil veya boş!"; exit 1; fi
           
-          # Verileri güvenli şekilde dosyalara yaz (Tırnak sorunu yaşamamak için)
-          printf "%s" "${{ secrets.CLIENT_SECRETS_BASE64 }}" | base64 -d > client_secrets.json
-          printf "%s" "${{ secrets.TOKEN_PICKLE_BASE64 }}" | base64 -d > token.pickle
+          # 2. Dosyaları oluştur
+          echo "${{ secrets.CLIENT_SECRETS_BASE64 }}" | base64 -d > client_secrets.json
+          echo "${{ secrets.TOKEN_PICKLE_BASE64 }}" | base64 -d > token.pickle
           
-          # Dosyaların oluştuğunu ve boyutunu logda doğrula
-          echo "Dosya kontrolleri:"
+          # 3. Dosya boyutlarını kontrol et (0 byte ise secret yanlıştır)
           ls -lh client_secrets.json token.pickle
-          
-          # Dosya içeriğinin boş olmadığını doğrula
-          echo "Dosya içeriği denetimi:"
-          head -c 50 client_secrets.json
-          echo "..."
 
       - name: Run Processing
         env:
