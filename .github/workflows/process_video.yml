@@ -19,9 +19,15 @@ jobs:
 
       - name: Create Secrets
         run: |
-          # Secrets'ı Base64 ile dosyalara yaz (Tırnak çakışmasını önler)
+          # Secret'ların boş olup olmadığını kontrol et
+          if [ -z "${{ secrets.CLIENT_SECRETS_BASE64 }}" ]; then echo "HATA: CLIENT_SECRETS_BASE64 boş!"; exit 1; fi
+          
+          # Dosyaları oluştur
           echo '${{ secrets.CLIENT_SECRETS_BASE64 }}' | base64 -d > client_secrets.json
           echo '${{ secrets.TOKEN_PICKLE_BASE64 }}' | base64 -d > token.pickle
+          
+          # Dosya kontrolü
+          ls -lh client_secrets.json token.pickle
 
       - name: Run Processing
         env:
