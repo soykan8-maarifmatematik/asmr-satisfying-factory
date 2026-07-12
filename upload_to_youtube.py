@@ -10,24 +10,22 @@ parser.add_argument("--file")
 parser.add_argument("--title")
 args = parser.parse_args()
 
-# Dosyaların bulunduğu tam yolu belirtiyoruz
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TOKEN_PATH = os.path.join(BASE_DIR, "token.pickle")
-SECRETS_PATH = os.path.join(BASE_DIR, "client_secrets.json")
 
-print(f"--- Yükleme Başladı ---")
+print(f"--- Yükleme Başlatılıyor ---")
 print(f"Dosya: {args.file}")
 
 if not os.path.exists(TOKEN_PATH):
     print(f"HATA: {TOKEN_PATH} bulunamadı!")
     sys.exit(1)
 
-with open(TOKEN_PATH, "rb") as token:
-    credentials = pickle.load(token)
-
-youtube = build("youtube", "v3", credentials=credentials)
-
 try:
+    with open(TOKEN_PATH, "rb") as token:
+        credentials = pickle.load(token)
+    
+    youtube = build("youtube", "v3", credentials=credentials)
+
     request = youtube.videos().insert(
         part="snippet,status",
         body={
@@ -38,6 +36,7 @@ try:
     )
     response = request.execute()
     print(f"BAŞARILI! Video ID: {response.get('id')}")
+
 except Exception as e:
     print(f"HATA DETAYI: {str(e)}")
     sys.exit(1)
