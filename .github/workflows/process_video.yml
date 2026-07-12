@@ -2,6 +2,7 @@ name: Process and Publish Video
 on:
   repository_dispatch:
     types: [video_uret]
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -19,7 +20,8 @@ jobs:
 
       - name: Create Secrets
         run: |
-          echo '${{ secrets.CLIENT_SECRETS_JSON }}' > client_secrets.json
+          # Secrets'ı dosyalara güvenli şekilde yaz
+          printf '%s' '${{ secrets.CLIENT_SECRETS_JSON }}' > client_secrets.json
           echo '${{ secrets.TOKEN_PICKLE_BASE64 }}' | base64 -d > token.pickle
 
       - name: Run Processing
@@ -27,4 +29,6 @@ jobs:
           PAYLOAD_TITLE: ${{ github.event.client_payload.VIDEO_TITLE }}
           PAYLOAD_CAT: ${{ github.event.client_payload.category }}
           PAYLOAD_TYPE: ${{ github.event.client_payload.PAYLOAD_TYPE }}
-        run: python server.py
+        run: |
+          # İşlemi başlat
+          python server.py
