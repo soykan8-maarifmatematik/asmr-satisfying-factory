@@ -1,54 +1,43 @@
 import argparse
 import os
 import sys
+import pickle
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
-from google.oauth2.credentials import Credentials
-import pickle
 
-# Argümanları al
 parser = argparse.ArgumentParser()
 parser.add_argument("--file")
 parser.add_argument("--title")
 args = parser.parse_args()
 
-file_path = args.file
-video_title = args.title
+# Dosyaların bulunduğu tam yolu belirtiyoruz
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+TOKEN_PATH = os.path.join(BASE_DIR, "token.pickle")
+SECRETS_PATH = os.path.join(BASE_DIR, "client_secrets.json")
 
 print(f"--- Yükleme Başladı ---")
-print(f"Dosya Yolu: {file_path}")
-print(f"Video Başlığı: {video_title}")
+print(f"Dosya: {args.file}")
 
-# 1. Kimlik Bilgilerini Yükle
-if not os.path.exists("token.pickle"):
-    print("HATA: token.pickle dosyası bulunamadı!")
+if not os.path.exists(TOKEN_PATH):
+    print(f"HATA: {TOKEN_PATH} bulunamadı!")
     sys.exit(1)
 
-with open("token.pickle", "rb") as token:
+with open(TOKEN_PATH, "rb") as token:
     credentials = pickle.load(token)
 
-# 2. YouTube Servisini Başlat
 youtube = build("youtube", "v3", credentials=credentials)
 
-# 3. Yükleme İşlemi
 try:
     request = youtube.videos().insert(
         part="snippet,status",
         body={
-            "snippet": {
-                "title": video_title,
-                "description": "Otomasyon ile yüklenmiştir.",
-                "categoryId": "28"  # Matematik/Eğitim için kategori ID
-            },
+            "snippet": {"title": args.title, "description": "Maarif Matematik Otomasyon", "categoryId": "27"},
             "status": {"privacyStatus": "public"}
         },
-        media_body=MediaFileUpload(file_path, chunksize=-1, resumable=True)
+        media_body=MediaFileUpload(args.file, chunksize=-1, resumable=True)
     )
-
-    print("YouTube'a gönderiliyor...")
     response = request.execute()
-    print(f"Yükleme başarıyla tamamlandı! Video ID: {response.get('id')}")
-
+    print(f"BAŞARILI! Video ID: {response.get('id')}")
 except Exception as e:
-    print(f"Yükleme sırasında hata oluştu: {str(e)}")
+    print(f"HATA DETAYI: {str(e)}")
     sys.exit(1)
