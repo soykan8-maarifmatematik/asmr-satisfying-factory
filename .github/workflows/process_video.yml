@@ -19,15 +19,18 @@ jobs:
 
       - name: Create Secrets
         run: |
-          # 1. Secret boş mu kontrol et (Boşsa işlemi durdur)
-          if [ -z "${{ secrets.CLIENT_SECRETS_BASE64 }}" ]; then echo "HATA: CLIENT_SECRETS_BASE64 tanımlı değil veya boş!"; exit 1; fi
-          
-          # 2. Dosyaları oluştur
+          # Secret'ları base64 -d ile dosyaya yazıyoruz
           echo "${{ secrets.CLIENT_SECRETS_BASE64 }}" | base64 -d > client_secrets.json
           echo "${{ secrets.TOKEN_PICKLE_BASE64 }}" | base64 -d > token.pickle
           
-          # 3. Dosya boyutlarını kontrol et (0 byte ise secret yanlıştır)
+          # Dosyalar gerçekten oluştu mu kontrol et
+          echo "Dosya boyutu kontrolü:"
           ls -lh client_secrets.json token.pickle
+          
+          # İlk 20 karakteri loga yazdır (dosya boşsa hata olduğunu anlarız)
+          echo "Dosya içeriği başı:"
+          head -c 20 client_secrets.json
+          echo ""
 
       - name: Run Processing
         env:
