@@ -20,8 +20,8 @@ jobs:
 
       - name: Create Secrets
         run: |
-          # Secrets'ı dosyalara güvenli şekilde yaz
-          printf '%s' '${{ secrets.CLIENT_SECRETS_JSON }}' > client_secrets.json
+          # Base64 ile kodlanmış secret'ları dosyalara güvenli şekilde geri dönüştür
+          echo '${{ secrets.CLIENT_SECRETS_BASE64 }}' | base64 -d > client_secrets.json
           echo '${{ secrets.TOKEN_PICKLE_BASE64 }}' | base64 -d > token.pickle
 
       - name: Run Processing
@@ -30,5 +30,4 @@ jobs:
           PAYLOAD_CAT: ${{ github.event.client_payload.category }}
           PAYLOAD_TYPE: ${{ github.event.client_payload.PAYLOAD_TYPE }}
         run: |
-          # İşlemi başlat
           python server.py
