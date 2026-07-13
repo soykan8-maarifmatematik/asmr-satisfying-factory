@@ -6,7 +6,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # Secret isimlerini burada doğru şekilde tanımlıyoruz
     env:
       CLIENT_BASE64: ${{ secrets.CLIENT_SECRETS_BASE64 }}
       TOKEN_BASE64: ${{ secrets.TOKEN_PICKLE_BASE64 }}
@@ -21,26 +20,16 @@ jobs:
 
       - name: Create Secrets
         run: |
-          # Eğer değişkenler boş gelirse hata vererek durdur
-          if [ -z "$CLIENT_BASE64" ]; then echo "HATA: CLIENT_SECRETS_BASE64 boş!"; exit 1; fi
-          if [ -z "$TOKEN_BASE64" ]; then echo "HATA: TOKEN_PICKLE_BASE64 boş!"; exit 1; fi
-          
-          # Dosyaları oluştur
           echo "$CLIENT_BASE64" | base64 -d > client_secrets.json
           echo "$TOKEN_BASE64" | base64 -d > token.pickle
-          
-          # Kontrol et
-          echo "Dosya boyutu kontrolü:"
-          ls -lh client_secrets.json token.pickle
 
       - name: Process and Upload
         env:
           PAYLOAD_TITLE: ${{ github.event.client_payload.VIDEO_TITLE }}
           PATH_CAT: ${{ github.event.client_payload.category }}
         run: |
-          mkdir -p output
-          # FFmpeg işleme (Döngü/Loop mantığı)
-          ffmpeg -y -i "content/shorts/$PATH_CAT/current_video.mp4" -filter_complex "[0:v]reverse[r];[0:v][r]concat=n=2:v=1:a=0[v]" -map "[v]" -c:v libx264 -crf 23 output/final_video.mp4
+          # 1. FFmpeg ile işleme
+          ffmpeg -y -i "content/shorts/$PATH_CAT/current_video.mp4" -filter_complex "[0:v]reverse[r];[0:v][r]concat=n=2:v=1:a=0[v]" -map "[v]" -c:v libx264 -crf 23 final_video.mp4
           
-          # Yükleme
-          python upload_to_youtube.py --file "output/final_video.mp4" --title "$PAYLOAD_TITLE"
+          # 2. Yükleme
+          python upload_to_youtube.py --file "final_video.mp4" --title "$PAYLOAD_TITLE"
