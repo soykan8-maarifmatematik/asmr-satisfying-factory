@@ -6,6 +6,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Secret'ları Environment değişkeni olarak alıyoruz
+    env:
+      CLIENT_BASE64: ${{ secrets.CLIENT_SECRETS_BASE64 }}
+      TOKEN_BASE64: ${{ secrets.TOKEN_PICKLE_BASE64 }}
+      
     steps:
       - uses: actions/checkout@v4
 
@@ -16,21 +21,25 @@ jobs:
 
       - name: Create Secrets
         run: |
-          echo "${{ secrets.CLIENT_SECRETS_BASE64 }}" | base64 -d > client_secrets.json
-          echo "${{ secrets.TOKEN_PICKLE_BASE64 }}" | base64 -d > token.pickle
-
-      - name: Process Video
-        env:
-          PATH_CAT: ${{ github.event.client_payload.category }}
-        run: |
-          mkdir -p output
-          # Ping-Pong Döngüsü (Kamera zıplamasını engellemek için)
-          ffmpeg -y -i "content/shorts/$PATH_CAT/current_video.mp4" -filter_complex "[0:v]reverse[r];[0:v][r]concat=n=2:v=1:a=0[v]" -map "[v]" -c:v libx264 -crf 23 output/final_video.mp4
+          # Eğer değişken boş gelirse doğrudan hata vererek durdur
+          if [ -z "$CLIENT_BASE64" ]; then echo "HATA: CLIENT_BASE64 boş!"; exit 1; fi
           
-      - name: Upload to YouTube
+          # Dosyaları oluştur
+          echo "$CLIENT_BASE64" | base64 -d > client_secrets.json
+          echo "$TOKEN_BASE64" | base64 -d > token.pickle
+          
+          # Kontrol et
+          echo "Dosya boyutu:"
+          ls -lh client_secrets.json
+
+      - name: Process and Upload
         env:
           PAYLOAD_TITLE: ${{ github.event.client_payload.VIDEO_TITLE }}
           PATH_CAT: ${{ github.event.client_payload.category }}
         run: |
-          # Burada upload_to_youtube.py dosyanızı çağırıyoruz
+          mkdir -p output
+          # FFmpeg işleme
+          ffmpeg -y -i "content/shorts/$PATH_CAT/current_video.mp4" -filter_complex "[0:v]reverse[r];[0:v][r]concat=n=2:v=1:a=0[v]" -map "[v]" -c:v libx264 -crf 23 output/final_video.mp4
+          
+          # Yükleme
           python upload_to_youtube.py --file "output/final_video.mp4" --title "$PAYLOAD_TITLE"
