@@ -20,12 +20,13 @@ jobs:
 
       - name: Create Secrets
         run: |
-          # Secret'ları base64 -d ile dosyaya yaz
+          # Değişkenleri kullanarak dosyaları oluştur
           echo "$CLIENT_BASE64" | base64 -d > client_secrets.json
           echo "$TOKEN_BASE64" | base64 -d > token.pickle
           
-          # Hata ayıklama: Dosyalar oluştu mu kontrol et
-          ls -lh client_secrets.json token.pickle
+          # HATA AYIKLAMA: Dosyaların içeriğini kontrol et
+          echo "Client Secrets içeriği:"
+          head -c 20 client_secrets.json
 
       - name: Process and Upload
         env:
