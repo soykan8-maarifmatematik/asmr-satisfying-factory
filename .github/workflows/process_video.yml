@@ -20,16 +20,20 @@ jobs:
 
       - name: Create Secrets
         run: |
+          # Secret'ları oluştur (Dosyalar oluşturuluyor)
           echo "$CLIENT_BASE64" | base64 -d > client_secrets.json
           echo "$TOKEN_BASE64" | base64 -d > token.pickle
+          
+          # HATA AYIKLAMA: Dosyaların oluştuğunu kontrol et
+          ls -lh client_secrets.json token.pickle
 
       - name: Process and Upload
         env:
           PAYLOAD_TITLE: ${{ github.event.client_payload.VIDEO_TITLE }}
           PATH_CAT: ${{ github.event.client_payload.category }}
         run: |
-          # 1. FFmpeg ile işleme
+          # FFmpeg işleme (Videonun döngü hali oluşturuluyor)
           ffmpeg -y -i "content/shorts/$PATH_CAT/current_video.mp4" -filter_complex "[0:v]reverse[r];[0:v][r]concat=n=2:v=1:a=0[v]" -map "[v]" -c:v libx264 -crf 23 final_video.mp4
           
-          # 2. Yükleme
+          # Yükleme (Python script'i tetikleniyor)
           python upload_to_youtube.py --file "final_video.mp4" --title "$PAYLOAD_TITLE"
