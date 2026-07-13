@@ -20,11 +20,11 @@ jobs:
 
       - name: Create Secrets
         run: |
-          # Secret'ları oluştur (Dosyalar oluşturuluyor)
+          # Secret'ları base64 -d ile dosyaya yaz
           echo "$CLIENT_BASE64" | base64 -d > client_secrets.json
           echo "$TOKEN_BASE64" | base64 -d > token.pickle
           
-          # HATA AYIKLAMA: Dosyaların oluştuğunu kontrol et
+          # Hata ayıklama: Dosyalar oluştu mu kontrol et
           ls -lh client_secrets.json token.pickle
 
       - name: Process and Upload
@@ -32,8 +32,11 @@ jobs:
           PAYLOAD_TITLE: ${{ github.event.client_payload.VIDEO_TITLE }}
           PATH_CAT: ${{ github.event.client_payload.category }}
         run: |
-          # FFmpeg işleme (Videonun döngü hali oluşturuluyor)
-          ffmpeg -y -i "content/shorts/$PATH_CAT/current_video.mp4" -filter_complex "[0:v]reverse[r];[0:v][r]concat=n=2:v=1:a=0[v]" -map "[v]" -c:v libx264 -crf 23 final_video.mp4
+          # 1. Klasörü oluştur
+          mkdir -p output
           
-          # Yükleme (Python script'i tetikleniyor)
-          python upload_to_youtube.py --file "final_video.mp4" --title "$PAYLOAD_TITLE"
+          # 2. FFmpeg işleme (Videonun döngü hali/reverse)
+          ffmpeg -y -i "content/shorts/$PATH_CAT/current_video.mp4" -filter_complex "[0:v]reverse[r];[0:v][r]concat=n=2:v=1:a=0[v]" -map "[v]" -c:v libx264 -crf 23 output/final_video.mp4
+          
+          # 3. Yükleme (Doğrudan upload_to_youtube.py tetikleniyor)
+          python upload_to_youtube.py --file "output/final_video.mp4" --title "$PAYLOAD_TITLE"
