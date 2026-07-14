@@ -16,13 +16,13 @@ jobs:
 
       - name: Create Secrets
         run: |
-          # Secret'ları doğrudan dosyaya yaz
+          # Secret değerlerini doğrudan çağırıp dosyaya yazıyoruz
           echo "${{ secrets.CLIENT_SECRETS_BASE64 }}" | base64 -d > client_secrets.json
           echo "${{ secrets.TOKEN_PICKLE_BASE64 }}" | base64 -d > token.pickle
           
-          # Boyut kontrolü (Sıfırsa secret yanlıştır)
-          ls -lh client_secrets.json
-
+          # HATA DENETİMİ: Dosyalar boş mu?
+          echo "Dosya boyutları (0 byte ise secret boştur):"
+          ls -lh client_secrets.json token.pickle
       - name: Process and Upload
         env:
           PAYLOAD_TITLE: ${{ github.event.client_payload.VIDEO_TITLE }}
