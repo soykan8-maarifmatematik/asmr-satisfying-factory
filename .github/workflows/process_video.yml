@@ -6,7 +6,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # Secret'ları buraya doğrudan bağlıyoruz
     env:
       CLIENT_SECRETS_BASE64: ${{ secrets.CLIENT_SECRETS_BASE64 }}
       TOKEN_PICKLE_BASE64: ${{ secrets.TOKEN_PICKLE_BASE64 }}
@@ -21,18 +20,14 @@ jobs:
 
       - name: Create Secrets
         run: |
-          # Bash değişkeni olarak çağırıyoruz
           echo "$CLIENT_SECRETS_BASE64" | base64 -d > client_secrets.json
           echo "$TOKEN_PICKLE_BASE64" | base64 -d > token.pickle
-          
-          # Hata denetimi: Dosya boyutuna bakın (0 ise secret boştur)
-          ls -lh client_secrets.json token.pickle
 
       - name: Process and Upload
         env:
-          PAYLOAD_TITLE: ${{ github.event.client_payload.VIDEO_TITLE }}
           PATH_CAT: ${{ github.event.client_payload.category }}
         run: |
           mkdir -p output
-          ffmpeg -y -i "content/shorts/$PATH_CAT/current_video.mp4" -filter_complex "[0:v]reverse[r];[0:v][r]concat=n=2:v=1:a=0[v]" -map "[v]" -c:v libx264 -crf 23 output/final_video.mp4
-          python upload_to_youtube.py --file "output/final_video.mp4" --title "$PAYLOAD_TITLE"
+          # Pinpon (reverse) yerine sonu başına bağlayan yumuşak geçiş (xfade)
+          ffmpeg -y -i "content/shorts/$PATH_CAT/current_video.mp4" -vf "split[a][b];[b]reverse[b_rev];[a]trim=start=0:end=0.5[a_start];[b_rev]trim=start=0:end=0.5[b_rev_start];[a_start][b_rev_start]xfade=transition=fade:duration=0.5:offset=0" -c:v libx264 -crf 23 output/final_video.mp4
+          python upload_to_youtube.py --file "output/final_video.mp4" --category "$PATH_CAT"
