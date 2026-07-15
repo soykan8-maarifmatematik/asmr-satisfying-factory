@@ -26,8 +26,15 @@ jobs:
       - name: Process and Upload
         env:
           PATH_CAT: ${{ github.event.client_payload.category }}
+          TYPE: ${{ github.event.client_payload.type }}
         run: |
           mkdir -p output
-          # Bıçağın donuk kaldığı kısımları atıp sadece hareketli olan orta kısmı (1.sn - 6.sn) döngüye alır
-          ffmpeg -y -i "content/shorts/$PATH_CAT/current_video.mp4" -filter_complex "[0:v]trim=start=1:end=6,setpts=PTS-STARTPTS[v];[0:a]atrim=start=1:end=6,asetpts=PTS-STARTPTS[a]" -map "[v]" -map "[a]" -c:v libx264 -crf 23 -pix_fmt yuv420p output/final_video.mp4
+          
+          # Eğer type "loop" ise pinpon (reverse) yap, "shorts" ise orjinali kullan
+          if [ "$TYPE" == "loop" ]; then
+            ffmpeg -y -i "content/shorts/$PATH_CAT/current_video.mp4" -filter_complex "[0:v]reverse[r];[0:v][r]concat=n=2:v=1:a=0[v]" -map "[v]" -c:v libx264 -crf 23 output/final_video.mp4
+          else
+            cp "content/shorts/$PATH_CAT/current_video.mp4" output/final_video.mp4
+          fi
+          
           python upload_to_youtube.py --file "output/final_video.mp4" --category "$PATH_CAT"
