@@ -28,6 +28,6 @@ jobs:
           PATH_CAT: ${{ github.event.client_payload.category }}
         run: |
           mkdir -p output
-          # Bıçağın donuk kaldığı kısımları kırpan, hareketli döngü sağlayan komut
-          ffmpeg -y -i "content/shorts/$PATH_CAT/current_video.mp4" -vf "split[a][b];[b]reverse[b_rev];[a]trim=start=0:end=0.5[a_start];[b_rev]trim=start=0:end=0.5[b_rev_start];[a_start][b_rev_start]xfade=transition=fade:duration=0.5:offset=0" -c:v libx264 -crf 23 output/final_video.mp4
+          # Bıçağın donuk kaldığı kısımları atıp sadece hareketli olan orta kısmı (1.sn - 6.sn) döngüye alır
+          ffmpeg -y -i "content/shorts/$PATH_CAT/current_video.mp4" -filter_complex "[0:v]trim=start=1:end=6,setpts=PTS-STARTPTS[v];[0:a]atrim=start=1:end=6,asetpts=PTS-STARTPTS[a]" -map "[v]" -map "[a]" -c:v libx264 -crf 23 -pix_fmt yuv420p output/final_video.mp4
           python upload_to_youtube.py --file "output/final_video.mp4" --category "$PATH_CAT"
