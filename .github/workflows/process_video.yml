@@ -6,6 +6,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Secret'ları buraya doğrudan bağlıyoruz
+    env:
+      CLIENT_SECRETS_BASE64: ${{ secrets.CLIENT_SECRETS_BASE64 }}
+      TOKEN_PICKLE_BASE64: ${{ secrets.TOKEN_PICKLE_BASE64 }}
+      
     steps:
       - uses: actions/checkout@v3
 
@@ -16,13 +21,13 @@ jobs:
 
       - name: Create Secrets
         run: |
-          # Secret değerlerini doğrudan çağırıp dosyaya yazıyoruz
-          echo "${{ secrets.CLIENT_SECRETS_BASE64 }}" | base64 -d > client_secrets.json
-          echo "${{ secrets.TOKEN_PICKLE_BASE64 }}" | base64 -d > token.pickle
+          # Bash değişkeni olarak çağırıyoruz
+          echo "$CLIENT_SECRETS_BASE64" | base64 -d > client_secrets.json
+          echo "$TOKEN_PICKLE_BASE64" | base64 -d > token.pickle
           
-          # HATA DENETİMİ: Dosyalar boş mu?
-          echo "Dosya boyutları (0 byte ise secret boştur):"
+          # Hata denetimi: Dosya boyutuna bakın (0 ise secret boştur)
           ls -lh client_secrets.json token.pickle
+
       - name: Process and Upload
         env:
           PAYLOAD_TITLE: ${{ github.event.client_payload.VIDEO_TITLE }}
