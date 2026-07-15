@@ -1,4 +1,29 @@
-- name: Process and Upload
+name: Process and Publish Video
+on:
+  repository_dispatch:
+    types: [video_uret]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      CLIENT_SECRETS_BASE64: ${{ secrets.CLIENT_SECRETS_BASE64 }}
+      TOKEN_PICKLE_BASE64: ${{ secrets.TOKEN_PICKLE_BASE64 }}
+      
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Environment
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg
+          pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib
+
+      - name: Create Secrets
+        run: |
+          echo "$CLIENT_SECRETS_BASE64" | base64 -d > client_secrets.json
+          echo "$TOKEN_PICKLE_BASE64" | base64 -d > token.pickle
+
+      - name: Process and Upload
         env:
           PATH_CAT: ${{ github.event.client_payload.category }}
           TYPE: ${{ github.event.client_payload.type }}
@@ -9,8 +34,7 @@
             # 1. Önce pinponlu 16 saniyelik temiz bir döngü oluştur
             ffmpeg -y -i "content/shorts/$PATH_CAT/current_video.mp4" -filter_complex "[0:v]reverse[r];[0:v][r]concat=n=2:v=1:a=0[v]" -c:v libx264 -crf 23 temp_loop.mp4
             
-            # 2. Döngüyü 15 dakikaya (900 sn) tamamlamak için 16 saniyelik dosyayı 57 kez tekrarla
-            # (900 / 16 = 56.25 -> 57 tekrar ile 15 dakikanın üzerini garanti ediyoruz)
+            # 2. Döngüyü 15 dakikaya tamamlamak için 57 kez tekrarla
             for i in {1..57}; do echo "file 'temp_loop.mp4'"; done > list.txt
             ffmpeg -y -f concat -safe 0 -i list.txt -c copy output/final_video.mp4
           else
