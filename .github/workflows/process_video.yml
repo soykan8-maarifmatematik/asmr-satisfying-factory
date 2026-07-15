@@ -30,10 +30,13 @@ jobs:
         run: |
           mkdir -p output
           
-          # Eğer type "loop" ise pinpon (reverse) yap, "shorts" ise orjinali kullan
           if [ "$TYPE" == "loop" ]; then
-            ffmpeg -y -i "content/shorts/$PATH_CAT/current_video.mp4" -filter_complex "[0:v]reverse[r];[0:v][r]concat=n=2:v=1:a=0[v]" -map "[v]" -c:v libx264 -crf 23 output/final_video.mp4
+            # 1. Pinpon (reverse) ile 16 saniyelik döngüyü oluştur
+            ffmpeg -y -i "content/shorts/$PATH_CAT/current_video.mp4" -filter_complex "[0:v]reverse[r];[0:v][r]concat=n=2:v=1:a=0[v]" -c:v libx264 -crf 23 temp_loop.mp4
+            # 2. Döngüyü 15 dakikaya (900 saniye) tamamlamak için 56 kez tekrarla
+            ffmpeg -y -stream_loop 56 -i temp_loop.mp4 -c copy output/final_video.mp4
           else
+            # Shorts için işlem yapmadan orjinali kullan
             cp "content/shorts/$PATH_CAT/current_video.mp4" output/final_video.mp4
           fi
           
