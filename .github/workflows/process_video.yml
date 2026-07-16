@@ -31,15 +31,16 @@ jobs:
         run: |
           mkdir -p output
           if [ "$TYPE" == "loop" ]; then
-            # 1. Sadece videoyu tersine çevir, sesin (a) orijinal kopyasını kullan
-            # Bu komut ses kanalını olduğu gibi korur, hata vermez
-            ffmpeg -y -i "content/shorts/$PATH_CAT/current_video.mp4" -filter_complex "[0:v]reverse[r];[0:v][r]concat=n=2:v=1:a=0[v]" -map "[v]" -map 0:a -c:v libx264 -c:a copy -crf 23 temp_loop.mp4
+            # Loop videoları için: 8sn + 8sn (pinpon) = 16sn'lik kusursuz döngü oluştur
+            ffmpeg -y -i "content/shorts/$PATH_CAT/current_video.mp4" -vf "reverse" temp_v_rev.mp4
+            ffmpeg -y -i "content/shorts/$PATH_CAT/current_video.mp4" -i temp_v_rev.mp4 -filter_complex "[0:v][0:a][1:v][1:a]concat=n=2:v=1:a=1[v][a]" -map "[v]" -map "[a]" temp_loop.mp4
             
-            # 2. Döngüyü 15 dakikaya tamamla
+            # 15 dakikaya tamamla (57 tekrar)
             for i in {1..57}; do echo "file 'temp_loop.mp4'"; done > list.txt
             ffmpeg -y -f concat -safe 0 -i list.txt -c copy output/final_video.mp4
           else
-            # Shorts için doğrudan kopyala
+            # Shorts videoları için: İşlem yok, ham 8 saniyeyi doğrudan al
             cp "content/shorts/$PATH_CAT/current_video.mp4" output/final_video.mp4
           fi
+          
           python upload_to_youtube.py --file "output/final_video.mp4" --category "$PATH_CAT"
