@@ -31,10 +31,13 @@ jobs:
         run: |
           mkdir -p output
           if [ "$TYPE" == "loop" ]; then
-            ffmpeg -y -i "content/shorts/$PATH_CAT/current_video.mp4" -filter_complex "[0:v]reverse[r];[0:v][r]concat=n=2:v=1:a=0[v]" -c:v libx264 -crf 23 temp_loop.mp4
+            # 1. Video ve sesi birlikte pinponla (ses tersine çevirme hatasını gidermek için)
+            ffmpeg -y -i "content/shorts/$PATH_CAT/current_video.mp4" -filter_complex "[0:v]reverse[r];[0:a]areverse[ar];[0:v][r]concat=n=2:v=1:a=0[v];[0:a][ar]concat=n=2:v=0:a=1[a]" -map "[v]" -map "[a]" -c:v libx264 -c:a aac -crf 23 temp_loop.mp4
+            # 2. Döngüyü 15 dakikaya tamamlamak için listele ve birleştir
             for i in {1..57}; do echo "file 'temp_loop.mp4'"; done > list.txt
             ffmpeg -y -f concat -safe 0 -i list.txt -c copy output/final_video.mp4
           else
+            # Shorts için doğrudan kopyala
             cp "content/shorts/$PATH_CAT/current_video.mp4" output/final_video.mp4
           fi
           python upload_to_youtube.py --file "output/final_video.mp4" --category "$PATH_CAT"
